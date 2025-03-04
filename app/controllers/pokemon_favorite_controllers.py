@@ -1,32 +1,42 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify 
 from app.tools.response_manager import ResponseManager
-from app.schemas.Pokemon_Favorites_Schema import PokemonFavoritoSchema 
+from app.schemas.Pokemon_Favorites_Schema import PokemonFavoriteSchema
 from bson import ObjectId
 from marshmallow import ValidationError
-from app.models.factory import ModelFactory
+from app.models.factory import  ModelFactory
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-bp = Blueprint("favorite_pokemon",__name__, url_prefix="/favorite-pokemons")
-RM = ResponseManager
-FP_MODEL = ModelFactory.get_models("po0kemon_favorites")
+bp = Blueprint("pokemon_favorite", __name__, url_prefix="/pokemons-favorites")
+RM = ResponseManager()
+FP_MODEL = ModelFactory.get_model("pokemons_favorites")
 FP_SCHEMA = PokemonFavoritoSchema()
 
-@bp.route("/", method=["POST"])
-def create():
+@bp.route ("/", methods=["POST"])
+@jwt_required()
+def create ():
+    user_id = get_jwt_identity()
     try:
-        data =request.json
-        data= FP_SCHEMA.validate(data)
-        fp= FP_MODEL.create(data)
+        data = request.json
+        data = FP_SCHEMA.load(data)
+        data["user_id"] = user_id
+        fp = FP_MODEL.create(data)
         return RM.success({"_id": fp})
     except ValidationError as err:
-        print (err)
-        return RM.error("Es necesario enviar todos los parametros")
+        print(err)
+        return RM.error("Envia todos lo parametros")
+    
 
-@bp.route("/<string:user_id>",methods=["DELETE"])
-def delete (id):
+@bp.route("/<string:id>", methods=["DELETE"])
+@jwt_required()
+def delete(id):
     FP_MODEL.delete(ObjectId(id))
     return RM.success("Pokemon eliminado con exito")
 
-@bp.route("/<string:user_id>",methods=["GET"])
-def get_all(user_id):
-    data =FP_MODEL.find_all(user_id)
+@bp.route("/", methods=["GET"])
+@jwt_required()
+def get_all():
+    user_id = get_jwt_identity()
+    data = FP_MODEL.find_all(user_id)
     return RM.success(data)
+
+
