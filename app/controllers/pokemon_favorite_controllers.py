@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify 
 from app.tools.response_manager import ResponseManager
-from app.schemas.Pokemon_Favorites_Schema import PokemonFavoriteSchema
+from app.schemas.Pokemon_Favorites_Schema import PokeFavSchema
 from bson import ObjectId
 from marshmallow import ValidationError
 from app.models.factory import  ModelFactory
@@ -9,7 +9,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 bp = Blueprint("pokemon_favorite", __name__, url_prefix="/pokemons-favorites")
 RM = ResponseManager()
 FP_MODEL = ModelFactory.get_model("pokemons_favorites")
-FP_SCHEMA = PokemonFavoriteSchema()
+FP_SCHEMA = PokeFavSchema()
 
 @bp.route ("/", methods=["POST"])
 @jwt_required()
@@ -20,7 +20,7 @@ def create ():
         data = FP_SCHEMA.load(data)
         data["user_id"] = user_id
         fp = FP_MODEL.create(data)
-        return RM.success({"_id": fp})
+        return RM.succes({"_id": fp})
     except ValidationError as err:
         print(err)
         return RM.error("Envia todos lo parametros")
@@ -37,6 +37,6 @@ def delete(id):
 def get_all():
     user_id = get_jwt_identity()
     data = FP_MODEL.find_all(user_id)
-    return RM.success(data)
+    return RM.succes(data)
 
 

@@ -25,9 +25,9 @@ def create_app():
         pokemon_favorite_controllers,
         user_controller
     )
-    app.register_blueprint(pokemon_controller.bp)
-    app.register_blueprint(pokemon_favorite_controller.bp)
-    app.register_blueprint(users_controller.bp)
+    app.register_blueprint(pokemon_controllers.bp)
+    app.register_blueprint(pokemon_favorite_controllers.bp)
+    app.register_blueprint(user_controller.bp)
 
     CORS(app)
     return app

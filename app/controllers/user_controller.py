@@ -17,10 +17,10 @@ user_model = ModelFactory.get_model("users")
 def login():
     data = request.json
     email = data.get("email",None)
-    password = data.get("paswword", None)
+    password = data.get("passwword", None)
     if not email or not password:
         return RM.error("Falta Contraseña/Correo")
-    user = user_model.get_by_email_password(email,password)
+    user = user_model.get_by_email_(email)
     if not user:
         return RM.error("No existe el usuario")
     if not EM.compare_hashes(password, user["password"]):
@@ -61,7 +61,7 @@ def delete():
 @jwt_required()
 def get_user():
     user_id = get_jwt_identity()
-    user = user_model.find_by_id(ObjectId(ObjectId))
+    user = user_model.find_by_id(ObjectId(user_id))
     if not user:
         return RM.error("El usuario no existe")
     return RM.succes(user)
