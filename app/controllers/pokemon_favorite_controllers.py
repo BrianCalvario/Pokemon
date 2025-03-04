@@ -9,7 +9,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 bp = Blueprint("pokemon_favorite", __name__, url_prefix="/pokemons-favorites")
 RM = ResponseManager()
 FP_MODEL = ModelFactory.get_model("pokemons_favorites")
-FP_SCHEMA = PokemonFavoritoSchema()
+FP_SCHEMA = PokemonFavoriteSchema()
 
 @bp.route ("/", methods=["POST"])
 @jwt_required()
